@@ -1,7 +1,6 @@
 import json
 import unittest
 
-import pandas as pd
 from trulens.core.dao.default_run import DefaultRunDao
 from trulens.core.dao.run import RunDaoBase
 from trulens.core.database.orm import make_orm_for_prefix
@@ -17,8 +16,7 @@ class FakeDB:
         from sqlalchemy.orm import sessionmaker
 
         self.engine = sa.create_engine("sqlite:///:memory:")
-        prefix = "trulens_"
-        self.orm = make_orm_for_prefix(prefix)
+        self.orm = make_orm_for_prefix(table_prefix="trulens_")
         self.orm.metadata.create_all(self.engine)
         self.session = sessionmaker(self.engine)
 
@@ -223,8 +221,6 @@ class TestDefaultRunDao(unittest.TestCase):
             source_type="DATAFRAME",
             dataset_spec={},
         )
-
-        import logging
 
         with self.assertLogs("trulens.core.dao.default_run", level="WARNING"):
             self.dao.call_compute_metrics_query(

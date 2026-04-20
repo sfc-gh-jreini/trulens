@@ -127,11 +127,12 @@ class TestInvokeSingleRow(unittest.TestCase):
 
 
 class TestStartParallelism(unittest.TestCase):
+    @patch("trulens.core.run.as_completed", side_effect=lambda fs: iter(fs))
     @patch("trulens.core.run.ThreadPoolExecutor")
     @patch.object(Run, "_can_start_new_invocation", return_value=True)
     @patch.object(Run, "get_status", return_value="CREATED")
     def test_start_uses_invocation_max_workers(
-        self, mock_status, mock_can_start, mock_pool_cls
+        self, mock_status, mock_can_start, mock_pool_cls, mock_as_completed
     ):
         run = _make_run(invocation_max_workers=2)
 
@@ -149,11 +150,12 @@ class TestStartParallelism(unittest.TestCase):
 
         mock_pool_cls.assert_called_once_with(max_workers=2)
 
+    @patch("trulens.core.run.as_completed", side_effect=lambda fs: iter(fs))
     @patch("trulens.core.run.ThreadPoolExecutor")
     @patch.object(Run, "_can_start_new_invocation", return_value=True)
     @patch.object(Run, "get_status", return_value="CREATED")
     def test_start_default_workers_capped_at_4(
-        self, mock_status, mock_can_start, mock_pool_cls
+        self, mock_status, mock_can_start, mock_pool_cls, mock_as_completed
     ):
         run = _make_run()
 
